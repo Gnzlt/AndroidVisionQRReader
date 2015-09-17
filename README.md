@@ -83,8 +83,8 @@ Next, we'll override `onActivityResult()` to get the request result.
 
         if (requestCode == QR_REQUEST) {
             if (resultCode == RESULT_OK) {
-            String qrData = data.getStringExtra(QRActivity.EXTRA_QR_RESULT);
-            // do something with the QR data String
+                String qrData = data.getStringExtra(QRActivity.EXTRA_QR_RESULT);
+                // do something with the QR data String
             } else {
                 mResultTextView.setText("Error");
             }
