@@ -1,7 +1,7 @@
 QR Reader based on Android Vision API
 ========================
 
-This is a small sample library that scan QR Codes using the new [Mobile Vision API for Android](https://developers.google.com/vision/) included in latest release of [Google Play Services](http://android-developers.blogspot.com.es/2015/08/barcode-detection-in-google-play.html), which avoid you to use external libraries.
+This is a small sample library that scans QR Codes using the new [Mobile Vision API for Android](https://developers.google.com/vision/) included in latest release of [Google Play Services](http://android-developers.blogspot.com.es/2015/08/barcode-detection-in-google-play.html), which allows you to avoid using external libraries.
 
 Feel free to use this project as a small sample of how to use this API for scanning QR Codes and customize it however you want ;)
 
