@@ -17,6 +17,7 @@ package com.gnzlt.AndroidVisionQRReader.camera;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.hardware.Camera;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -78,6 +79,7 @@ public class CameraSourcePreview extends ViewGroup {
     private void startIfReady() throws IOException {
         if (mStartRequested && mSurfaceAvailable) {
             mCameraSource.start(mSurfaceView.getHolder());
+            VisionApiCameraFix.cameraFocus(mCameraSource, Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
             mStartRequested = false;
         }
     }
