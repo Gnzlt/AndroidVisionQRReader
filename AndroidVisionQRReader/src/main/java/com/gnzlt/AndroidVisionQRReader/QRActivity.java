@@ -1,12 +1,18 @@
 package com.gnzlt.AndroidVisionQRReader;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
+import android.widget.Toast;
 
 import com.gnzlt.AndroidVisionQRReader.camera.CameraSourcePreview;
 import com.google.android.gms.vision.CameraSource;
@@ -20,6 +26,7 @@ public class QRActivity extends AppCompatActivity {
 
     private static final String TAG = "QRActivity";
     public static final String EXTRA_QR_RESULT = "EXTRA_QR_RESULT";
+    private static final int PERMISSIONS_REQUEST = 100;
 
     private BarcodeDetector mBarcodeDetector;
     private CameraSource mCameraSource;
@@ -32,14 +39,41 @@ public class QRActivity extends AppCompatActivity {
 
         mPreview = (CameraSourcePreview) findViewById(R.id.cameraSourcePreview);
 
-        setupBarcodeDetector();
-        setupCameraSource();
+        if (isPermissionGranted()) {
+            setupBarcodeDetector();
+            setupCameraSource();
+        } else {
+            requestPermission();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        startCameraSource();
+        if (isPermissionGranted())
+            startCameraSource();
+    }
+
+    private boolean isPermissionGranted() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    recreate();
+                }
+            } else {
+                Toast.makeText(this, "This application needs Camera permission to read QR codes", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
     }
 
     private void setupBarcodeDetector() {
@@ -50,7 +84,7 @@ public class QRActivity extends AppCompatActivity {
         mBarcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void release() {
-                
+
             }
 
             @Override
@@ -81,6 +115,7 @@ public class QRActivity extends AppCompatActivity {
     }
 
     private void startCameraSource() {
+        Log.d(TAG, "Camera Source started");
         if (mCameraSource != null) {
             try {
                 mPreview.start(mCameraSource);
