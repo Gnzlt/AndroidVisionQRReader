@@ -24,8 +24,8 @@ import java.io.IOException;
 
 public class QRActivity extends AppCompatActivity {
 
-    private static final String TAG = "QRActivity";
     public static final String EXTRA_QR_RESULT = "EXTRA_QR_RESULT";
+    private static final String TAG = "QRActivity";
     private static final int PERMISSIONS_REQUEST = 100;
 
     private BarcodeDetector mBarcodeDetector;
@@ -77,7 +77,7 @@ public class QRActivity extends AppCompatActivity {
     }
 
     private void setupBarcodeDetector() {
-        mBarcodeDetector = new BarcodeDetector.Builder(this)
+        mBarcodeDetector = new BarcodeDetector.Builder(getApplicationContext())
                 .setBarcodeFormats(Barcode.QR_CODE)
                 .build();
 
@@ -103,14 +103,14 @@ public class QRActivity extends AppCompatActivity {
 
         if (!mBarcodeDetector.isOperational())
             Log.w(TAG, "Detector dependencies are not yet available.");
-
     }
 
     private void setupCameraSource() {
-        mCameraSource = new CameraSource.Builder(this, mBarcodeDetector)
+        mCameraSource = new CameraSource.Builder(getApplicationContext(), mBarcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedFps(15.0f)
                 .setRequestedPreviewSize(1600, 1024)
+                .setAutoFocusEnabled(true)
                 .build();
     }
 
@@ -146,7 +146,9 @@ public class QRActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mPreview.stop();
+        if (mPreview != null) {
+            mPreview.stop();
+        }
     }
 
     @Override

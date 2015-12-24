@@ -17,7 +17,6 @@ package com.gnzlt.AndroidVisionQRReader.camera;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.hardware.Camera;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -50,7 +49,7 @@ public class CameraSourcePreview extends ViewGroup {
         addView(mSurfaceView);
     }
 
-    public void start(CameraSource cameraSource) throws IOException {
+    public void start(CameraSource cameraSource) throws IOException, SecurityException {
         if (cameraSource == null) {
             stop();
         }
@@ -76,32 +75,10 @@ public class CameraSourcePreview extends ViewGroup {
         }
     }
 
-    private void startIfReady() throws IOException {
+    private void startIfReady() throws IOException, SecurityException {
         if (mStartRequested && mSurfaceAvailable) {
             mCameraSource.start(mSurfaceView.getHolder());
-            VisionApiCameraFix.cameraFocus(mCameraSource, Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
             mStartRequested = false;
-        }
-    }
-
-    private class SurfaceCallback implements SurfaceHolder.Callback {
-        @Override
-        public void surfaceCreated(SurfaceHolder surface) {
-            mSurfaceAvailable = true;
-            try {
-                startIfReady();
-            } catch (IOException e) {
-                Log.e(TAG, "Could not start camera source.", e);
-            }
-        }
-
-        @Override
-        public void surfaceDestroyed(SurfaceHolder surface) {
-            mSurfaceAvailable = false;
-        }
-
-        @Override
-        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         }
     }
 
@@ -143,6 +120,8 @@ public class CameraSourcePreview extends ViewGroup {
 
         try {
             startIfReady();
+        } catch (SecurityException se) {
+            Log.e(TAG, "Do not have permission to start the camera", se);
         } catch (IOException e) {
             Log.e(TAG, "Could not start camera source.", e);
         }
@@ -159,5 +138,28 @@ public class CameraSourcePreview extends ViewGroup {
 
         Log.d(TAG, "isPortraitMode returning false by default");
         return false;
+    }
+
+    private class SurfaceCallback implements SurfaceHolder.Callback {
+        @Override
+        public void surfaceCreated(SurfaceHolder surface) {
+            mSurfaceAvailable = true;
+            try {
+                startIfReady();
+            } catch (SecurityException se) {
+                Log.e(TAG, "Do not have permission to start the camera", se);
+            } catch (IOException e) {
+                Log.e(TAG, "Could not start camera source.", e);
+            }
+        }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder surface) {
+            mSurfaceAvailable = false;
+        }
+
+        @Override
+        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        }
     }
 }

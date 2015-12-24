@@ -57,10 +57,14 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == QR_REQUEST) {
-            if (resultCode == RESULT_OK)
-                mResultTextView.setText(data.getStringExtra(QRActivity.EXTRA_QR_RESULT));
-            else
-                mResultTextView.setText("Error");
+            String result;
+            if (resultCode == RESULT_OK) {
+                result = data.getStringExtra(QRActivity.EXTRA_QR_RESULT);
+            } else {
+                result = "Error";
+            }
+            mResultTextView.setText(result);
+            mResultTextView.setVisibility(View.VISIBLE);
         }
     }
 }
